@@ -13,9 +13,6 @@ function App() {
   const scrolltoAns = useRef();
   const [loader, setloader] = useState(false);
 
-const URL = "https://api.groq.com/openai/v1/chat/completions";
-
-
   const askQuestion = async () => {
     if (!question && !selectedHistory) {
       return false;
