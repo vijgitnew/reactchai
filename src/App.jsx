@@ -15,6 +15,8 @@ function App() {
   
 const URL = "https://api.groq.com/openai/v1/chat/completions";
 
+const API_KEY = import.meta.env.VITE_API_KEY;
+
   const askQuestion = async () => {
     if (!question && !selectedHistory) {
       return false;
@@ -107,10 +109,10 @@ useEffect(() => {
   return (
     <div className={darkMode?'dark':'light'}>
     <div className="grid grid-cols-5 h-screen">
-      <select className="fixed text-white bottom-0" onChange={(event)=> setDarkMode(event.target.value) } >
+      {/* <select className="fixed text-white bottom-0" onChange={(event)=> setDarkMode(event.target.value) } >
         <option value="dark">Dark</option>
         <option value="light">Light</option>
-      </select>
+      </select> */}
       <RecentSearch RecentHistory={RecentHistory} setRecentHistory={setRecentHistory}  setSelectedHistory={setSelectedHistory} />
 
       <div className="col-span-4 p-10 flex flex-col">
