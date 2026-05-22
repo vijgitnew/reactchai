@@ -1,54 +1,53 @@
-import { useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import "./App.css";
 import Answers from "./components/Answer";
-
+import RecentSearch from "./components/recentserch";
+import QuestionAnswer from "./components/QuestionAnswer";
 function App() {
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState([]);
-  const [RecentHistory, setRecentHistory] = useState(JSON.parse(localStorage.getItem("history")));
+  const [RecentHistory, setRecentHistory] = useState(
+    JSON.parse(localStorage.getItem("history")),
+  );
+  const [selectedHistory, setSelectedHistory] = useState("");
+  const scrolltoAns = useRef();
+  const [loader, setloader] = useState(false);
+  
+const URL = "https://api.groq.com/openai/v1/chat/completions";
 
-  const URL = "https://api.groq.com/openai/v1/chat/completions";
-
-  const API_KEY = import.meta.env.VITE_API_KEY;
+const API_KEY = import.meta.env.VITE_API_KEY;
 
   const askQuestion = async () => {
-   if (localStorage.getItem("history")) {
+    if (!question && !selectedHistory) {
+      return false;
+    }
+    if (question) {
+      if (localStorage.getItem("history")) {
+        let history = JSON.parse(localStorage.getItem("history"));
 
-  let history =
-    JSON.parse(localStorage.getItem("history"));
+        history = [question, ...history];
 
-  history = [question, ...history];
+        localStorage.setItem("history", JSON.stringify(history));
 
-  localStorage.setItem(
-    "history",
-    JSON.stringify(history)
-  );
+        setRecentHistory(history);
+      } else {
+        localStorage.setItem("history", JSON.stringify([question]));
 
-  setRecentHistory(history);
-
-} else {
-
-  localStorage.setItem(
-    "history",
-    JSON.stringify([question])
-  );
-
-  setRecentHistory([question]);
-
-}
-    if (!question.trim()) return;
-
+        setRecentHistory([question]);
+      }
+    }
+    if (!question.trim() && !selectedHistory.trim()) return;
 
     const payload = {
       model: "llama-3.3-70b-versatile",
       messages: [
         {
           role: "user",
-          content: question,
+          content: question || selectedHistory,
         },
       ],
     };
-
+    setloader(true);
     try {
       const response = await fetch(URL, {
         method: "POST",
@@ -66,61 +65,77 @@ function App() {
       datastring = datastring.map((item) => item.trim());
       setAnswer((prev) => [
         ...prev,
-        { type: "q", text: question },
+        { type: "q", text: question ? question : selectedHistory },
         { type: "a", text: aiResponse },
       ]);
     } catch (error) {
       console.log(error);
     }
+    setQuestion("");
+    setTimeout(() => {
+      scrolltoAns.current.scrollTop = scrolltoAns.current.scrollHeight;
+    }, 500);
+      setloader(false);
   };
-  console.log(RecentHistory);
+
+ 
+  const isEnter = (event) => {
+    console.log(event.key);
+    if (event.key === "Enter") {
+      askQuestion();
+    }
+  };
+  useEffect(() => {
+    console.log(selectedHistory);
+    askQuestion();
+  }, [selectedHistory]);
+
+  // dark mode feature
+const [darkMode, setDarkMode] = useState("dark");
+
+useEffect(() => {
+
+  if (darkMode === "dark") {
+
+    document.documentElement.classList.add("dark");
+
+  } else {
+
+    document.documentElement.classList.remove("dark");
+
+  }
+
+}, [darkMode]);
   return (
+    <div className={darkMode?'dark':'light'}>
     <div className="grid grid-cols-5 h-screen">
-      <div className="col-span-1 bg-zinc-900 text-white p-5">
-        <h1 className="sol-span-1 text-xl text-white bg-zinc-800 p-3 text-center" >Recent Search</h1>
-<ul className="pl-5 text-left overflow-auto text-sm p-5" >
-
-{
-  RecentHistory &&
-  RecentHistory.map((item, index) => (
-
-    <li
-      key={index}
-      className="mb-2 text-white "
-    >
-      {item}
-    </li>
-
-  ))
-}
-
-</ul>
-      </div>
+      <select className="fixed text-white bottom-0" onChange={(event)=> setDarkMode(event.target.value) } >
+        <option value="dark">Dark</option>
+        <option value="light">Light</option>
+      </select>
+      <RecentSearch RecentHistory={RecentHistory} setRecentHistory={setRecentHistory}  setSelectedHistory={setSelectedHistory} />
 
       <div className="col-span-4 p-10 flex flex-col">
-        <div className="flex-1 border rounded-2xl p-5 height-110 overflow-auto">
+        <h4 className="text-4xl bg-clip-text text-transparent mb-5 bg-gradient-to-r from-green-700 to-purple-500 text-center">Hello User, Ask me Anything</h4>
+       
+     
+        <div
+          ref={scrolltoAns}
+          className=" border rounded-2xl p-5 h-[760px] scrollbar-thin overflow-auto"
+        >
+            {
+        loader?  <div
+          className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-[#332d2d] motion-reduce:animate-[spin_1.5s_linear_infinite]"
+          role="status"
+        >
+          <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
+            Loading...
+          </span>
+        </div>:null
+        }
           <ul>
             {answer.map((item, index) => (
-              <div
-                key={index}
-                className={item.type === "q" ? "flex justify-end" : ""}
-              >
-                {item.type === "q" ? (
-                  <li className="text-right p-1 bg-zinc-700 border-zinc-700 rounded-3xl w-fit">
-                    <Answers ans={item.text} />
-                  </li>
-                ) : Array.isArray(item.text) ? (
-                  item.text.map((ansitem, ansindex) => (
-                    <li key={ansindex} className="text-left p-2">
-                      <Answers ans={ansitem} />
-                    </li>
-                  ))
-                ) : (
-                  <li className="text-left p-2">
-                    <Answers ans={item.text} />
-                  </li>
-                )}
-              </div>
+             <QuestionAnswer item={item} index={index} />
             ))}
           </ul>
         </div>
@@ -131,6 +146,7 @@ function App() {
             value={question}
             onChange={(event) => setQuestion(event.target.value)}
             placeholder="Ask anything..."
+            onKeyDown={isEnter}
             className="flex-1 bg-transparent outline-none px-4 py-2"
           />
 
@@ -142,6 +158,7 @@ function App() {
           </button>
         </div>
       </div>
+    </div>
     </div>
   );
 }

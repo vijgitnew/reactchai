@@ -12,7 +12,7 @@ const Answers = ({ ans }) => {
     );
   }
 
-  return <p className="text-white mb-2">{ans}</p>;
+  return <p className="text-white">{ans}</p>;
 };
 
 export default Answers;
