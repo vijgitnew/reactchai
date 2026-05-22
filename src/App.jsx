@@ -12,10 +12,9 @@ function App() {
   const [selectedHistory, setSelectedHistory] = useState("");
   const scrolltoAns = useRef();
   const [loader, setloader] = useState(false);
-  
+
 const URL = "https://api.groq.com/openai/v1/chat/completions";
 
-const API_KEY = import.meta.env.VITE_API_KEY;
 
   const askQuestion = async () => {
     if (!question && !selectedHistory) {
