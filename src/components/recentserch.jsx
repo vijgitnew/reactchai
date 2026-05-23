@@ -5,8 +5,8 @@ function RecentSearch({RecentHistory, setRecentHistory, setSelectedHistory}){
   };
     return (
         <>
-        <div className="col-span-1 bg-zinc-900 text-white p-5">
-        <h1 className="sol-span-1 text-xl  text-white bg-zinc-800  text-center flex justify-center">
+        <div className="col-span-1 dark:bg-zinc-900 bg-amber-100 dark:text-white text-black p-5">
+        <h1 className="sol-span-1 text-xl  dark:text-white dark:bg-zinc-900 bg-zinc-400 text-black  text-center flex justify-center">
           <button onClick={ClearHistory} className="m-2  flex cursor:pointer">
             Recent Search
             <svg
@@ -27,7 +27,7 @@ function RecentSearch({RecentHistory, setRecentHistory, setSelectedHistory}){
               <li
                 key={index}
                 onClick={() => setSelectedHistory(item)}
-                className=" text-white truncate p-1  text-zinc-400 cursor-pointer hover:bg-zinc-700 hover:text-zinc-200"
+                className=" dark:text-white  truncate p-1  text-zinc-900 cursor-pointer hover:bg-zinc-700 hover:text-zinc-200"
               >
                 {item}
               </li>

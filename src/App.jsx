@@ -91,7 +91,7 @@ const API_KEY = import.meta.env.VITE_API_KEY;
   }, [selectedHistory]);
 
   // dark mode feature
-const [darkMode, setDarkMode] = useState("dark");
+ const [darkMode, setDarkMode] = useState("dark");
 
 useEffect(() => {
 
@@ -107,12 +107,12 @@ useEffect(() => {
 
 }, [darkMode]);
   return (
-    <div className={darkMode?'dark':'light'}>
+   <div className={darkMode === "dark" ? "dark" : "light"}>
     <div className="grid grid-cols-5 h-screen">
-      {/* <select className="fixed text-white bottom-0" onChange={(event)=> setDarkMode(event.target.value) } >
-        <option value="dark">Dark</option>
-        <option value="light">Light</option>
-      </select> */}
+      <select className="fixed bg-zinc-800 text-white bottom-3 left-[10px]" onChange={(event)=> setDarkMode(event.target.value) } >
+        <option value="dark"  className=" text-white hover:text-black">Dark</option>
+        <option value="light"  className=" text-white hover:text-black">Light</option>
+      </select>
       <RecentSearch RecentHistory={RecentHistory} setRecentHistory={setRecentHistory}  setSelectedHistory={setSelectedHistory} />
 
       <div className="col-span-4 p-10 flex flex-col">
@@ -121,18 +121,20 @@ useEffect(() => {
      
         <div
           ref={scrolltoAns}
-          className=" border rounded-2xl p-5 h-[760px] scrollbar-thin overflow-auto"
+          className=" border rounded-2xl p-5 h-[728px] scrollbar-thin overflow-auto"
         >
-            {
-        loader?  <div
-          className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-[#332d2d] motion-reduce:animate-[spin_1.5s_linear_infinite]"
-          role="status"
-        >
-          <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
-            Loading...
-          </span>
-        </div>:null
-        }
+              {
+        loader ? (
+          <div className="flex justify-center items-center h-full">
+            <div
+              className="h-10 w-10 animate-spin rounded-full border-4 border-solid border-current border-e-transparent text-zinc-500"
+              role="status"
+            >
+              <span className="hidden">Loading...</span>
+            </div>
+          </div>
+        ) : null
+      }
           <ul>
             {answer.map((item, index) => (
              <QuestionAnswer item={item} index={index} />
@@ -140,14 +142,14 @@ useEffect(() => {
           </ul>
         </div>
 
-        <div className="bg-zinc-800 text-white mt-5 p-2 rounded-full flex items-center">
+        <div className="dark:bg-zinc-800 bg-red-100 dark:text-white  bg-red-100  text-black mt-5 p-2 rounded-full flex items-center">
           <input
             type="text"
             value={question}
             onChange={(event) => setQuestion(event.target.value)}
             placeholder="Ask anything..."
             onKeyDown={isEnter}
-            className="flex-1 bg-transparent outline-none px-4 py-2"
+            className="flex-1 bg-transparent dark:text-white  text-black outline-none px-4 py-2"
           />
 
           <button
